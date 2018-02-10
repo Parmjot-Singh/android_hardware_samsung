@@ -540,6 +540,11 @@ static int mixer_init(struct audio_device *adev)
             } while (mixer == NULL);
 
             sprintf(mixer_path, "/system/etc/mixer_paths_%d.xml", card);
+            if (access(mixer_path, F_OK) == -1) {
+                ALOGE("%s: Failed to load mixer paths from %s, your system is going to crash",
+                      __func__, mixer_path);
+            }
+
             audio_route = audio_route_init(card, mixer_path);
             if (!audio_route) {
                 ALOGE("%s: Failed to init audio route controls for card %d, aborting.",
@@ -980,7 +985,9 @@ int disable_snd_device(struct audio_device *adev,
 {
     struct mixer_card *mixer_card;
     struct listnode *node;
+    struct audio_usecase *out_uc_info = get_usecase_from_type(adev, PCM_PLAYBACK);
     const char *snd_device_name = get_snd_device_name(snd_device);
+    const char *out_snd_device_name = NULL;
 
     if (snd_device_name == NULL)
         return -EINVAL;
@@ -1006,6 +1013,15 @@ int disable_snd_device(struct audio_device *adev,
             update_mixer = true;
 #endif /* DSP_POWEROFF_DELAY */
             audio_route_reset_path(mixer_card->audio_route, snd_device_name);
+            if (out_uc_info != NULL) {
+                /*
+                 * Cycle the rx device to eliminate routing conflicts.
+                 * This prevents issues when an input route shares mixer controls with an output
+                 * route.
+                 */
+                out_snd_device_name = get_snd_device_name(out_uc_info->out_snd_device);
+                audio_route_apply_path(mixer_card->audio_route, out_snd_device_name);
+            }
             if (update_mixer) {
                 audio_route_update_mixer(mixer_card->audio_route);
             }
@@ -4139,11 +4155,8 @@ static int adev_set_parameters(struct audio_hw_device *dev, const char *kvpairs)
                             value,
                             sizeof(value));
     if (ret >= 0) {
-        /* TODO: Add support in voice calls */
         if (strcmp(value, AUDIO_PARAMETER_VALUE_ON) == 0) {
             adev->voice.bluetooth_wb = true;
-            ALOGI("%s: Implement support for BT SCO wideband calls!!!",
-                  __func__);
         } else {
             adev->voice.bluetooth_wb = false;
         }
@@ -4553,6 +4566,7 @@ static int adev_open(const hw_module_t *module, const char *name,
     adev->voice.volume = 1.0f;
     adev->voice.bluetooth_nrec = true;
     adev->voice.in_call = false;
+    adev->voice.bluetooth_wb = false;
 
     /* adev->cur_hdmi_channels = 0;  by calloc() */
     adev->snd_dev_ref_cnt = calloc(SND_DEVICE_MAX, sizeof(int));
