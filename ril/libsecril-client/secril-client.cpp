@@ -21,6 +21,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <utils/Log.h>
+#include <android/log.h>
 #include <pthread.h>
 #include "secril-client.h"
 #include <hardware_legacy/power.h> // For wakelock
@@ -154,7 +155,6 @@ static int processRxBuffer(RilClientPrv *prv, void *buffer, size_t buflen);
 static uint32_t AllocateToken(uint32_t *token_pool);
 static void FreeToken(uint32_t *token_pool, uint32_t token);
 static uint8_t IsValidToken(uint32_t *token_pool, uint32_t token);
-static void DeallocateToken(uint32_t *token_pool, uint32_t token);
 static int blockingWrite(int fd, const void *buffer, size_t len);
 static int RecordReqHistory(RilClientPrv *prv, int token, uint32_t id);
 static void ClearReqHistory(RilClientPrv *prv, int token);
@@ -1086,7 +1086,6 @@ static int SendOemRequestHookRaw(HRilClient client, int req_id, char *data, size
     uint32_t header = 0;
     android::Parcel p;
     RilClientPrv *client_prv;
-    int maxfd = -1;
 
     unsigned int check_req_id = req_id;
 
@@ -1228,7 +1227,6 @@ static char ConvertAudioPath(AudioPath path) {
 static void * RxReaderFunc(void *param) {
     RilClientPrv *client_prv = (RilClientPrv *)param;
     int maxfd = 0;
-    int token = 0;
     void *p_record = NULL;
     size_t recordlen = 0;
     int ret = 0;
@@ -1576,12 +1574,6 @@ static RilOnComplete FindReqHandler(RilClientPrv *prv, int token, uint32_t *id) 
 
     return NULL;
 }
-
-
-static void DeallocateToken(uint32_t *token_pool, uint32_t token) {
-    *token_pool &= !token;
-}
-
 
 static int blockingWrite(int fd, const void *buffer, size_t len) {
     size_t writeOffset = 0;

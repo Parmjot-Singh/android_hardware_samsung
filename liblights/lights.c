@@ -178,7 +178,6 @@ static int write_leds(const struct led_config *led)
 
     char blink[32];
     int count, err;
-    int color;
 
     if (led == NULL)
         led = &led_off;
@@ -307,26 +306,6 @@ static int set_light_bln_notifications(struct light_device_t *dev __unused,
                                   struct light_state_t const *state)
 {
     int err = 0;
-
-    if (hw_components & COMPONENT_LED) {
-        ALOGD("%s: BLN LED_BLINK color=0x%010x, fM=%d, fOnMS=%d, fOffMs=%d.", __func__,
-            state->color, state->flashMode, state->flashOnMS, state->flashOffMS);
-
-        struct led_config led;
-        switch (state->flashMode) {
-            case LIGHT_FLASH_TIMED:
-            case LIGHT_FLASH_HARDWARE:
-                led.delay_on  = state->flashOnMS;
-                led.delay_off = state->flashOffMS;
-                break;
-            default:
-                /* Set LED to a solid color, spec is unclear on the exact behavior here. */
-                led.delay_on = led.delay_off = 0;
-                break;
-        }
-        led.color = LED_BRIGHTNESS_NOTIFICATION;
-        write_leds(&led);
-    }
 
     pthread_mutex_lock(&g_lock);
     err = write_str(LED_BLN_NODE, state->color & COLOR_MASK ? "1" : "0");

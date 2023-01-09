@@ -48,15 +48,19 @@ static const struct company_range murata_ranges = {
         "00:26:e8",
         "00:37:6d",
         "00:60:57",
+        "00:9d:6b",
         "00:ae:fa",
         "04:46:65",
         "10:5f:06",
+        "10:98:c3",
         "10:a5:d0",
         "10:d5:42",
         "14:7d:c5",
+        "1c:70:22",
         "1c:99:4c",
         "20:02:af",
         "40:f3:08",
+        "44:91:60",
         "44:a7:cf",
         "5c:da:d4",
         "5c:f8:a1",
@@ -74,6 +78,7 @@ static const struct company_range murata_ranges = {
         "b0:72:bf",
         "b8:d7:af",
         "c8:14:79",
+        "cc:c0:79",
         "d0:e4:4a",
         "d8:c4:6a",
         "dc:ef:ca",
@@ -89,6 +94,7 @@ static const struct company_range semcosh_ranges = {
         "34:23:ba",
         "38:aa:3c",
         "5c:0a:5b",
+        "6c:c7:ec",
         "88:32:9b",
         "90:18:7c",
         "cc:3a:61"
@@ -98,7 +104,11 @@ static const struct company_range semcosh_ranges = {
 static const struct company_range semco3rd_ranges = {
     .type = SEMCO3RD,
     .macaddrs = {
+        "04:d6:aa",
+        "08:c5:e1",
+        "24:18:1d",
         "2c:0e:3d",
+        "30:07:4d",
         "54:88:0e",
         "84:38:38",
         "8c:f5:a3",
@@ -113,7 +123,6 @@ static const struct company_range semco3rd_ranges = {
         "e8:50:8b",
         "ec:1f:72",
         "ec:9b:f3",
-        "f0:25:b7",
         "f4:09:d8",
         "f8:04:2e"
     }
@@ -122,11 +131,17 @@ static const struct company_range semco3rd_ranges = {
 static const struct company_range semco_ranges = {
     .type = SEMCO,
     .macaddrs = {
+        "48:13:7e",
         "4c:66:41",
         "51:f6:6b",
+        "94:76:b7",
+        "a4:84:31",
         "cc:07:ab",
         "d8:c4:e9",
-        "ec:9b:f3"
+        "e8:3a:12",
+        "ec:9b:f3",
+        "f0:25:b7",
+        "f8:e6:1a"
     }
 };
 
